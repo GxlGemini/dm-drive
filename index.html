@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>驱动下载中心</title>
+  <meta name="description" content="驱动与工具下载中心" />
+  <style>
+    :root {
+      --bg-1: #ffffff;
+      --bg-2: #fff5f5;
+      --card: rgba(255,255,255,.9);
+      --line: rgba(220, 38, 38, .1);
+      --text-main: #1f2937;
+      --text-sub: #6b7280;
+      --primary: #ef4444;
+      --primary-deep: #dc2626;
+      --primary-light: #fee2e2;
+      --shadow-sm: 0 4px 12px rgba(220, 38, 38, .05);
+      --shadow-md: 0 10px 30px rgba(220, 38, 38, .08);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --ease-silk: cubic-bezier(.22,.86,.24,1);
+      --top-offset: 90px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
+      background: linear-gradient(180deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      overflow-x: hidden;
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 30px));
+      margin: 0 auto;
+    }
+
+    .top-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding-top: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.8);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--line);
+    }
+
+    .brand {
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: var(--primary-deep);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+    }
+    .nav a {
+      text-decoration: none;
+      color: var(--text-main);
+      font-size: .95rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 999px;
+      transition: all .3s;
+    }
+    .nav a:hover, .nav a.active {
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, .3);
+    }
+
+    .hero {
+      padding: 40px 0;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      color: var(--primary-deep);
+      margin: 0 0 10px;
+    }
+    .hero p {
+      color: var(--text-sub);
+      font-size: 1.1rem;
+      margin: 0 0 30px;
+    }
+
+    .search-box {
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      height: 54px;
+      border-radius: 999px;
+      border: 2px solid var(--primary-light);
+      padding: 0 24px;
+      font-size: 1rem;
+      outline: none;
+      transition: all .3s;
+    }
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, .1);
+    }
+
+    .section {
+      scroll-margin-top: var(--top-offset);
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--line);
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary-deep);
+      margin: 0 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card-link {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      text-decoration: none;
+      color: inherit;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      transition: all .3s;
+    }
+    .card-link:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      color: var(--primary-deep);
+      display: grid;
+      place-items: center;
+      font-size: 1.5rem;
+    }
+    .card-link:hover .card-icon {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .card-body { flex: 1; min-width: 0; }
+    .card-title {
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-tag {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: 40px;
+      color: var(--text-sub);
+    }
+    .empty-state.show { display: block; }
+
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      color: var(--text-sub);
+      font-size: 0.9rem;
+    }
+
+    .hidden-by-filter { display: none !important; }
+
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; gap: 16px; border-radius: 24px; }
+      .nav { flex-wrap: wrap; justify-content: center; }
+      .hero h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container top-wrap">
+    <div class="topbar">
+      <div class="brand">🔴 驱动下载中心</div>
+      <nav class="nav">
+        <a href="#network" data-filter="network" class="active">网卡驱动</a>
+        <a href="#bluetooth" data-filter="bluetooth">蓝牙驱动</a>
+        <a href="#tools" data-filter="tools">工具软件</a>
+        <a href="#firmware" data-filter="firmware">固件下载</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="hero container">
+    <h1>驱动与工具下载</h1>
+    <p>快速查找并下载您需要的驱动程序、固件及工具软件</p>
+    <div class="search-box">
+      <input id="searchInput" type="text" placeholder="搜索型号或驱动名称，如：AD086" />
+    </div>
+  </header>
+
+  <main class="container" id="mainContent">
+    <section class="section" id="network" data-section="network">
+      <div class="section-title">🌐 网卡驱动</div>
+      <div class="cards">
+        <a class="card-link" href="https://wwbgi.lanzouq.com/irklF3m40heb" target="_blank" download>
+          <div class="card-icon">🔌</div>
+          <div class="card-body">
+            <div class="card-title">AD081S 网卡驱动</div>
+            <div class="card-tag">自动安装</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/ipMwp3m40b2d" target="_blank" download>
+          <div class="card-icon">💻</div>
+          <div class="card-body">
+            <div class="card-title">AD081 网卡驱动</div>
+            <div class="card-tag">通用版本</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/iIhwO3m40syh" target="_blank" download>
+          <div class="card-icon">⚡</div>
+          <div class="card-body">
+            <div class="card-title">AD082 网卡驱动</div>
+            <div class="card-tag">高速网卡</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/i8Cm23m40zza" target="_blank" download>
+          <div class="card-icon">📡</div>
+          <div class="card-body">
+            <div class="card-title">AD083 网卡驱动</div>
+            <div class="card-tag">无线接收器</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/iKWVN3m41e1g" target="_blank" download>
+          <div class="card-icon">📶</div>
+          <div class="card-body">
+            <div class="card-title">AD085 网卡驱动</div>
+            <div class="card-tag">WiFi 适配器</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/iSW393m41k6h" target="_blank" download>
+          <div class="card-icon">🚀</div>
+          <div class="card-body">
+            <div class="card-title">AD086 网卡驱动</div>
+            <div class="card-tag">增强版驱动</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://f005.backblazeb2.com/file/img-gxl/%E7%BD%91%E5%8D%A1%E9%A9%B1%E5%8A%A8/AD087-600M%E8%93%9D%E7%89%99%2Bwifi.zip" target="_blank" download>
+          <div class="card-icon">✨</div>
+          <div class="card-body">
+            <div class="card-title">AD087 网卡驱动</div>
+            <div class="card-tag">600M 蓝牙 + WiFi</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/iBxKL338ysgd" target="_blank" download>
+          <div class="card-icon">🦀</div>
+          <div class="card-body">
+            <div class="card-title">RTL8153 驱动</div>
+            <div class="card-tag">Realtek 芯片</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/ic10D3m42lha" target="_blank" download>
+          <div class="card-icon">📡</div>
+          <div class="card-body">
+            <div class="card-title">CHB011&018 驱动</div>
+            <div class="card-tag">内置驱动 </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="bluetooth" data-section="bluetooth">
+      <div class="section-title">🦷 蓝牙驱动</div>
+      <div class="cards">
+        <a class="card-link" href="https://f005.backblazeb2.com/file/img-gxl/%E8%93%9D%E7%89%99%E9%80%82%E9%85%8D%E5%99%A8/AD030.zip" target="_blank" download>
+          <div class="card-icon">🔵</div>
+          <div class="card-body">
+            <div class="card-title">AD030 驱动</div>
+            <div class="card-tag">BT 5.0 / Win7</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/i6HrR338y2de" target="_blank" download>
+          <div class="card-icon">🔵</div>
+          <div class="card-body">
+            <div class="card-title">AD050 驱动</div>
+            <div class="card-tag">BT 5.1 / Win7</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/ibH8t338y2sj" target="_blank" download>
+          <div class="card-icon">🔵</div>
+          <div class="card-body">
+            <div class="card-title">AD088 驱动</div>
+            <div class="card-tag">BT 5.3 / Win7</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="tools" data-section="tools">
+      <div class="section-title">🧰 工具软件</div>
+      <div class="cards">
+        <a class="card-link" href="https://wwtw.lanzouq.com/inV9t338y7ub" target="_blank" download>
+          <div class="card-icon">💾</div>
+          <div class="card-body">
+            <div class="card-title">DiskGenius Pro</div>
+            <div class="card-tag">数据恢复神器</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/idMji338y72d" target="_blank" download>
+          <div class="card-icon">🩹</div>
+          <div class="card-body">
+            <div class="card-title">R-Studio</div>
+            <div class="card-tag">专业文件恢复</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/ijW9x338y8pc" target="_blank" download>
+          <div class="card-icon">⚙️</div>
+          <div class="card-body">
+            <div class="card-title">FormatTool</div>
+            <div class="card-tag">FAT32 格式化</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="firmware" data-section="firmware">
+      <div class="section-title">🛠️ 硬盘盒固件</div>
+      <div class="cards">
+        <a class="card-link" href="https://wwbgi.lanzouq.com/it64f3f7w01e" target="_blank" download>
+          <div class="card-icon">📼</div>
+          <div class="card-body">
+            <div class="card-title">HD010 &amp; 036</div>
+            <div class="card-tag">固件升级</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/iUmNs338ywzg" target="_blank" download>
+          <div class="card-icon">📼</div>
+          <div class="card-body">
+            <div class="card-title">HD1300 固件</div>
+            <div class="card-tag">RTL9210B</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/iUSyH338yxmj" target="_blank" download>
+          <div class="card-icon">📼</div>
+          <div class="card-body">
+            <div class="card-title">HD2000 固件</div>
+            <div class="card-tag">RTL9220</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/iwNe7338yy1e" target="_blank" download>
+          <div class="card-icon">📼</div>
+          <div class="card-body">
+            <div class="card-title">JMS580 固件</div>
+            <div class="card-tag">JMicron 芯片</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwbgi.lanzouq.com/iFiqf3f7uk1c" target="_blank" download>
+          <div class="card-icon">📼</div>
+          <div class="card-body">
+            <div class="card-title">HD035 固件</div>
+            <div class="card-tag">JMS578</div>
+          </div>
+        </a>
+        <a class="card-link" href="https://wwtw.lanzouq.com/i1jBG356s5ha" target="_blank" download>
+          <div class="card-icon">📼</div>
+          <div class="card-body">
+            <div class="card-title">RTL9210 系列</div>
+            <div class="card-tag">通用固件</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <div class="empty-state" id="emptyState">
+      没有找到匹配内容，请尝试其他关键词。
+    </div>
+  </main>
+
+  <footer>
+    © 2026 驱动下载中心. All rights reserved.
+  </footer>
+
+  <script>
+    const searchInput = document.getElementById('searchInput');
+    const sections = document.querySelectorAll('.section');
+    const emptyState = document.getElementById('emptyState');
+    const navLinks = document.querySelectorAll('.nav a');
+
+    // 搜索功能
+    searchInput.addEventListener('input', (e) => {
+      const keyword = e.target.value.toLowerCase().trim();
+      let hasVisibleCard = false;
+
+      sections.forEach(section => {
+        const cards = section.querySelectorAll('.card-link');
+        let sectionHasVisibleCard = false;
+
+        cards.forEach(card => {
+          const text = card.textContent.toLowerCase();
+          if (text.includes(keyword)) {
+            card.classList.remove('hidden-by-filter');
+            sectionHasVisibleCard = true;
+            hasVisibleCard = true;
+          } else {
+            card.classList.add('hidden-by-filter');
+          }
+        });
+
+        if (sectionHasVisibleCard) {
+          section.classList.remove('hidden-by-filter');
+        } else {
+          section.classList.add('hidden-by-filter');
+        }
+      });
+
+      if (hasVisibleCard || keyword === '') {
+        emptyState.classList.remove('show');
+      } else {
+        emptyState.classList.add('show');
+      }
+    });
+
+    // 导航高亮
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          navLinks.forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+          });
+        }
+      });
+    }, { threshold: 0.5 });
+
+    sections.forEach(section => observer.observe(section));
+  </script>
+</body>
+</html>
+
